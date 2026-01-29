@@ -2,6 +2,12 @@
 
 A real-time collaborative drawing application where multiple users can draw together on a shared canvas.
 
+## 🌐 Live Demo
+
+**https://collaborative-canvas-gvxg.onrender.com**
+
+Open in two browser windows to test real-time collaboration!
+
 ## Features
 
 - **Real-time Drawing**: See others draw as they draw, not after they finish
