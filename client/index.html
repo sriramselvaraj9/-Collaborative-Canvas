@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Collaborative Canvas - Draw Together</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <span class="logo-icon">🎨</span>
+                <h1>Collaborative Canvas</h1>
+            </div>
+            <div class="connection-status">
+                <span id="statusDot" class="status-dot disconnected"></span>
+                <span id="statusText">Connecting...</span>
+            </div>
+            <div class="user-info">
+                <span id="userColor" class="user-color"></span>
+                <span id="username">Loading...</span>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Toolbar -->
+            <aside class="toolbar">
+                <div class="tool-section">
+                    <h3>Tools</h3>
+                    <div class="tool-buttons">
+                        <button id="brushTool" class="tool-btn active" title="Brush (B)">
+                            <span class="tool-icon">🖌️</span>
+                            <span class="tool-name">Brush</span>
+                        </button>
+                        <button id="eraserTool" class="tool-btn" title="Eraser (E)">
+                            <span class="tool-icon">🧹</span>
+                            <span class="tool-name">Eraser</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="tool-section">
+                    <h3>Colors</h3>
+                    <div class="color-picker-wrapper">
+                        <input type="color" id="colorPicker" value="#000000">
+                        <span>Custom</span>
+                    </div>
+                    <div class="color-presets">
+                        <button class="color-preset" data-color="#000000" style="background-color: #000000" title="Black"></button>
+                        <button class="color-preset" data-color="#ffffff" style="background-color: #ffffff" title="White"></button>
+                        <button class="color-preset" data-color="#e74c3c" style="background-color: #e74c3c" title="Red"></button>
+                        <button class="color-preset" data-color="#e67e22" style="background-color: #e67e22" title="Orange"></button>
+                        <button class="color-preset" data-color="#f1c40f" style="background-color: #f1c40f" title="Yellow"></button>
+                        <button class="color-preset" data-color="#2ecc71" style="background-color: #2ecc71" title="Green"></button>
+                        <button class="color-preset" data-color="#3498db" style="background-color: #3498db" title="Blue"></button>
+                        <button class="color-preset" data-color="#9b59b6" style="background-color: #9b59b6" title="Purple"></button>
+                        <button class="color-preset" data-color="#1abc9c" style="background-color: #1abc9c" title="Teal"></button>
+                        <button class="color-preset" data-color="#34495e" style="background-color: #34495e" title="Dark Gray"></button>
+                        <button class="color-preset" data-color="#e91e63" style="background-color: #e91e63" title="Pink"></button>
+                        <button class="color-preset" data-color="#795548" style="background-color: #795548" title="Brown"></button>
+                    </div>
+                </div>
+
+                <div class="tool-section">
+                    <h3>Stroke Width</h3>
+                    <div class="stroke-slider">
+                        <input type="range" id="strokeWidth" min="1" max="50" value="3">
+                        <span id="strokeValue">3px</span>
+                    </div>
+                </div>
+
+                <div class="tool-section">
+                    <h3>Actions</h3>
+                    <div class="action-buttons">
+                        <button id="undoBtn" class="action-btn" title="Undo (Ctrl+Z)">
+                            <span>↩️</span> Undo
+                        </button>
+                        <button id="redoBtn" class="action-btn" title="Redo (Ctrl+Y)">
+                            <span>↪️</span> Redo
+                        </button>
+                        <button id="clearBtn" class="action-btn danger" title="Clear Canvas">
+                            <span>🗑️</span> Clear
+                        </button>
+                    </div>
+                </div>
+
+                <div class="tool-section users-section">
+                    <h3>Online Users</h3>
+                    <div id="usersList" class="users-list">
+                        <!-- Users will be added dynamically -->
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Canvas Area -->
+            <div class="canvas-wrapper">
+                <div class="canvas-container" id="canvasContainer">
+                    <canvas id="drawingCanvas"></canvas>
+                    <div id="cursorsContainer" class="cursors-container"></div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Notifications Container -->
+        <div id="notifications" class="notifications"></div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="canvas.js"></script>
+    <script src="websocket.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>
