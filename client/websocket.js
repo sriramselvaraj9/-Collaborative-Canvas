@@ -10,6 +10,8 @@ class WebSocketClient {
         this.username = null;
         this.userColor = null;
         this.connected = false;
+        this.reconnectAttempts = 0;
+        this.maxReconnectAttempts = 10;
         
         // Event callbacks
         this.callbacks = {
@@ -23,7 +25,9 @@ class WebSocketClient {
             onCursorUpdate: null,
             onUndoStroke: null,
             onRedoStroke: null,
-            onCanvasCleared: null
+            onCanvasCleared: null,
+            onReconnecting: null,
+            onReconnectFailed: null
         };
     }
     
@@ -31,8 +35,15 @@ class WebSocketClient {
      * Connect to the WebSocket server
      */
     connect() {
-        // Use Socket.io client
-        this.socket = io();
+        // Use Socket.io client with reconnection options
+        this.socket = io({
+            reconnection: true,
+            reconnectionAttempts: this.maxReconnectAttempts,
+            reconnectionDelay: 1000,
+            reconnectionDelayMax: 5000,
+            timeout: 20000,
+            transports: ['websocket', 'polling']
+        });
         
         this.setupEventListeners();
     }
@@ -45,18 +56,47 @@ class WebSocketClient {
         this.socket.on('connect', () => {
             console.log('Connected to server');
             this.connected = true;
+            this.reconnectAttempts = 0;
             if (this.callbacks.onConnect) {
                 this.callbacks.onConnect();
             }
         });
         
         // Connection lost
-        this.socket.on('disconnect', () => {
-            console.log('Disconnected from server');
+        this.socket.on('disconnect', (reason) => {
+            console.log('Disconnected from server:', reason);
             this.connected = false;
             if (this.callbacks.onDisconnect) {
-                this.callbacks.onDisconnect();
+                this.callbacks.onDisconnect(reason);
             }
+        });
+        
+        // Reconnection attempt
+        this.socket.on('reconnect_attempt', (attemptNumber) => {
+            console.log(`Reconnection attempt ${attemptNumber}...`);
+            this.reconnectAttempts = attemptNumber;
+            if (this.callbacks.onReconnecting) {
+                this.callbacks.onReconnecting(attemptNumber);
+            }
+        });
+        
+        // Reconnection successful
+        this.socket.on('reconnect', (attemptNumber) => {
+            console.log(`Reconnected after ${attemptNumber} attempts`);
+            this.reconnectAttempts = 0;
+        });
+        
+        // Reconnection failed
+        this.socket.on('reconnect_failed', () => {
+            console.log('Failed to reconnect after max attempts');
+            if (this.callbacks.onReconnectFailed) {
+                this.callbacks.onReconnectFailed();
+            }
+        });
+        
+        // Connection error
+        this.socket.on('connect_error', (error) => {
+            console.log('Connection error:', error.message);
         });
         
         // Initial data from server

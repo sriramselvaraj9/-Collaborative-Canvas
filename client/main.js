@@ -90,11 +90,24 @@ function setupWebSocketCallbacks() {
     // Connection established
     wsClient.on('connect', () => {
         updateConnectionStatus(true);
+        showNotification('Connected to server');
     });
     
     // Connection lost
     wsClient.on('disconnect', () => {
         updateConnectionStatus(false);
+        showNotification('Disconnected - attempting to reconnect...');
+    });
+    
+    // Reconnecting
+    wsClient.on('reconnecting', (attemptNumber) => {
+        updateConnectionStatus(false, `Reconnecting (${attemptNumber})...`);
+    });
+    
+    // Reconnection failed
+    wsClient.on('reconnectFailed', () => {
+        updateConnectionStatus(false, 'Connection failed');
+        showNotification('Could not reconnect to server. Please refresh the page.');
     });
     
     // Initial data received
@@ -288,7 +301,7 @@ function setActiveTool(tool) {
 /**
  * Update connection status indicator
  */
-function updateConnectionStatus(connected) {
+function updateConnectionStatus(connected, customMessage) {
     const statusDot = document.getElementById('statusDot');
     const statusText = document.getElementById('statusText');
     
@@ -297,7 +310,11 @@ function updateConnectionStatus(connected) {
     }
     
     if (statusText) {
-        statusText.textContent = connected ? 'Connected' : 'Disconnected';
+        if (customMessage) {
+            statusText.textContent = customMessage;
+        } else {
+            statusText.textContent = connected ? 'Connected' : 'Disconnected';
+        }
     }
 }
 
